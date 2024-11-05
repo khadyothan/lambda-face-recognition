@@ -1,0 +1,20 @@
+# Creating ECR Repo
+
+    aws ecr create-repository --repository-name project3 --region us-east-1 --image-scanning-configuration scanOnPush=true --image-tag-mutability MUTABLE
+
+# Create image and push it to AWS ECR
+
+    
+    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 084828561591.dkr.ecr.us-east-1.amazonaws.com
+    docker tag project3:latest 084828561591.dkr.ecr.us-east-1.amazonaws.com/project3:latest
+    docker push 084828561591.dkr.ecr.us-east-1.amazonaws.com/project3:latest
+
+    aws lambda create-function \
+    --function-name gop \
+    --package-type Image \docker build --platform linux/amd64 --provenance=false -t project3:latest .
+    --code ImageUri=084828561591.dkr.ecr.us-east-1.amazonaws.com/project3:latest \
+    --role arn:aws:iam::084828561591:role/project3
+
+    aws lambda invoke --function-name gop --payload file://event.json output.json
+
+
