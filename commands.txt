@@ -4,17 +4,23 @@
 
 # Create image and push it to AWS ECR
 
-    
+    docker build --platform linux/amd64 --provenance=false -t project3:latest .
     aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 084828561591.dkr.ecr.us-east-1.amazonaws.com
     docker tag project3:latest 084828561591.dkr.ecr.us-east-1.amazonaws.com/project3:latest
     docker push 084828561591.dkr.ecr.us-east-1.amazonaws.com/project3:latest
 
     aws lambda create-function \
     --function-name gop \
-    --package-type Image \docker build --platform linux/amd64 --provenance=false -t project3:latest .
+    --package-type Image \
     --code ImageUri=084828561591.dkr.ecr.us-east-1.amazonaws.com/project3:latest \
     --role arn:aws:iam::084828561591:role/project3
 
     aws lambda invoke --function-name gop --payload file://event.json output.json
+
+# Local testing
+curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d @event.json
+docker run -p 9000:8080 project3:latest
+docker exec -it 1111111111 /bin/bash
+
 
 
