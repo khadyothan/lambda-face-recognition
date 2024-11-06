@@ -44,7 +44,6 @@ RUN apt-get install -y ffmpeg
 
 # Copy handler function
 COPY requirements.txt ${FUNCTION_DIR}
-COPY test_0.mp4 ${FUNCTION_DIR}
 #COPY ffmpeg ${FUNCTION_DIR}
 #COPY ffmpeg /usr/bin
 
