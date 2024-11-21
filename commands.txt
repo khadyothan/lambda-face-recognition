@@ -26,3 +26,7 @@
     python workload_generator.py --access_key AKIARHQBNEC37WPUWBWV --secret_key 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 --input_bucket 1229729607-input --output_bucket 1229729607-stage-1 --testcase_folder Project_2/dataset/test_case_1/
     python workload_generator.py --access_key AKIARHQBNEC37WPUWBWV --secret_key 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 --input_bucket 1229729607-input --output_bucket 1229729607-stage-1 --testcase_folder Project_2/dataset/test_case_2/
     python grader_script_p1.py --access_key AKIARHQBNEC37WPUWBWV --secret_key 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 --input_bucket 1229729607-input --output_bucket 1229729607-stage-1 --lambda_name video-splitting
+
+
+    python workload_generator.py --access_key AKIARHQBNEC37WPUWBWV --secret_key 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 --asu_id 1229729607 --testcase_folder Project_2/dataset/test_case_1/
+    python grader_script_p2_v2.py --access_key AKIARHQBNEC37WPUWBWV --secret_key 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 --asu_id 1229729607

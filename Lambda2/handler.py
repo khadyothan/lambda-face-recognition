@@ -11,6 +11,8 @@ from boto3 import client as boto3_client
 
 s3 = boto3_client("s3")
 output_bucket  = '1229729607-output'
+data_file_name = 'data.pt'
+additional_data_bucket = '1229729607-additional'
 
 os.environ['TORCH_HOME'] = '/tmp'
 mtcnn = MTCNN(image_size=240, margin=0, min_face_size=20)
@@ -36,6 +38,14 @@ def handler(event, context):
         s3.upload_file(upload_path, output_bucket, output_file_key)
     return "Success"
 
+def download_data():
+    local_path = f'/tmp/{data_file_name}'
+    if not os.path.exists(local_path):
+        print(f"Downloading data.pt from {additional_data_bucket} bucket")
+        s3.download_file(Bucket=additional_data_bucket, Key=data_file_name, Filename=local_path)
+        print(f"Downloaded successfully")
+    return local_path
+
 def face_recognition_function(key_path):
     # Face extraction
     img = cv2.imread(key_path, cv2.IMREAD_COLOR)
@@ -45,7 +55,7 @@ def face_recognition_function(key_path):
     key = os.path.splitext(os.path.basename(key_path))[0].split(".")[0]
     img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
     face, prob = mtcnn(img, return_prob=True, save_path=None)
-    saved_data = torch.load('./data.pt')
+    saved_data = torch.load(download_data())
     if face != None:
         emb = resnet(face.unsqueeze(0)).detach()
         embedding_list = saved_data[0]
