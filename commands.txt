@@ -1,32 +1,29 @@
-# Creating ECR Repo
+# Create ECR Repository
+aws ecr create-repository --repository-name project3 --region us-east-1 --image-scanning-configuration scanOnPush=true --image-tag-mutability MUTABLE
 
-    aws ecr create-repository --repository-name project3 --region us-east-1 --image-scanning-configuration scanOnPush=true --image-tag-mutability MUTABLE
+# Build and Push Docker Image to ECR
+docker build --platform linux/amd64 --provenance=false -t project3:latest .
+aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin <your_account_id>.dkr.ecr.us-east-1.amazonaws.com
+docker tag project3:latest <your_account_id>.dkr.ecr.us-east-1.amazonaws.com/project3:latest
+docker push <your_account_id>.dkr.ecr.us-east-1.amazonaws.com/project3:latest
 
-# Create image and push it to AWS ECR
+# Create AWS Lambda Function
+aws lambda create-function \
+  --function-name gop \
+  --package-type Image \
+  --code ImageUri=<your_account_id>.dkr.ecr.us-east-1.amazonaws.com/project3:latest \
+  --role arn:aws:iam::<your_account_id>:role/project3
 
-    docker build --platform linux/amd64 --provenance=false -t project3:latest .
-    aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 084828561591.dkr.ecr.us-east-1.amazonaws.com
-    docker tag project3:latest 084828561591.dkr.ecr.us-east-1.amazonaws.com/project3:latest
-    docker push 084828561591.dkr.ecr.us-east-1.amazonaws.com/project3:latest
+# Invoke Lambda Function
+aws lambda invoke --function-name gop --payload file://event.json output.json
 
-    aws lambda create-function \
-    --function-name gop \
-    --package-type Image \
-    --code ImageUri=084828561591.dkr.ecr.us-east-1.amazonaws.com/project3:latest \
-    --role arn:aws:iam::084828561591:role/project3
+# Local Testing
+curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d @event.json
+docker run -p 9000:8080 project3:latest
+docker exec -it <container_id> /bin/bash
 
-    aws lambda invoke --function-name gop --payload file://event.json output.json
+# Workload Generator Testing
+python workload_generator.py --access_key $AWS_ACCESS_KEY_ID --secret_key $AWS_SECRET_ACCESS_KEY --input_bucket your-input-bucket --output_bucket your-output-bucket --testcase_folder /path/to/test_case/
 
-# Local testing
-    curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d @event.json
-    docker run -p 9000:8080 project3:latest
-    docker exec -it 1111111111 /bin/bash
-
-# Workload generator testing
-    python workload_generator.py --access_key AKIARHQBNEC37WPUWBWV --secret_key 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 --input_bucket 1229729607-input --output_bucket 1229729607-stage-1 --testcase_folder Project_2/dataset/test_case_1/
-    python workload_generator.py --access_key AKIARHQBNEC37WPUWBWV --secret_key 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 --input_bucket 1229729607-input --output_bucket 1229729607-stage-1 --testcase_folder Project_2/dataset/test_case_2/
-    python grader_script_p1.py --access_key AKIARHQBNEC37WPUWBWV --secret_key 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 --input_bucket 1229729607-input --output_bucket 1229729607-stage-1 --lambda_name video-splitting
-
-
-    python workload_generator.py --access_key AKIARHQBNEC37WPUWBWV --secret_key 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 --asu_id 1229729607 --testcase_folder Project_2/dataset/test_case_1/
-    python grader_script_p2_v2.py --access_key AKIARHQBNEC37WPUWBWV --secret_key TG11NFxVmmcySgmckRRsUaVwrSXzGjoQuuOqO43I --asu_id 1229729607
+# Grader Script Testing
+python grader_script_p2_v2.py --access_key YOUR_ACCESS_KEY --secret_key YOUR_SECRET_KEY --asu_id YOUR_ASU_ID
