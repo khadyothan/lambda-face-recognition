@@ -19,18 +19,14 @@ A serverless face recognition system built using AWS Lambda, S3, and [facenet-py
 
 ## Project Structure
 
-.
-├── face_recognition_lambda/ # Lambda function for face recognition
-├── video_splitting_lambda/ # Lambda function for video to frame conversion
-├── outputs_1229729607/ # Output results from Lambda functions
-├── utilities/ # Utility scripts and helpers
-├── assets/ # Images and diagrams for documentation
-├── grader_script_p1.py # Grading script for part 1
-├── grader_script_p2_v2.py # Grading script for part 2 (v2)
-├── workload_generator.py # Workload generator for part 1
-├── workload_generator_p2.py # Workload generator for part 2
-├── commands.txt # Commands for building, deploying, and testing
-└── README.md # Project documentation
+lambda/
+   handler.py # Lambda function code
+   requirements.txt # Python dependencies
+   Dockerfile # Lambda deployment container
+   entry.sh # Entrypoint script
+   data.pt # Face embeddings database
+grader_script_p1.py # grading/utility scripts
+workload_generator.py
 
 ## Quick Start
 
